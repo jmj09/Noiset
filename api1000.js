@@ -1,11 +1,10 @@
 /*jslint node: true */
 'use strict';
-var express = require('express');
-var app = express();
-//var util = require('util');
-var exec = require('child_process').exec,
-  child;
-var options = {
+let express = require('express');
+let app = express();
+//let util = require('util');
+let exec = require('child_process').exec, child;
+let options = {
   timeout: 1000,
   killSignal: 'SIGKILL'
 }
@@ -20,7 +19,7 @@ exports.api = function api() {
       if (err) {
         if (err) {throw err; }
       }
-      var lines = stdout.toString().split('\n'),
+      let lines = stdout.toString().split('\n'),
         results = new Array(100),
         i,
         numline = 0,
@@ -32,7 +31,7 @@ exports.api = function api() {
         }
       }
       lines.forEach(function (line) {
-        var proc = line.substring(0, 26),
+        let proc = line.substring(0, 26),
           pid =  line.substring(26, 35),
           util1 =  line.substring(66, 69),
           util2 =  line.substring(70, 73);
