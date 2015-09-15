@@ -3,19 +3,22 @@
 let express = require('express');
 let app = express();
 //let util = require('util');
-let exec = require('child_process').exec, child;
-let options = {
+let exec = require('child_process').exec,
+  child;
+const options = {
   timeout: 1000,
   killSignal: 'SIGKILL'
 }
+api();
 // Add private api get proxying
-exports.api = function api() {
-  app.get('/rss', function (req, res) {
-
+//exports.api = 
+function api() {
+  //console.log('enter api');
+  app.get('/rss', function (req, res) { 
+  //console.log('enter get');
   child = exec('tasklist',
-    options,
+    options, 
     function (err, stdout, stderr) {
-
       if (err) {
         if (err) {throw err; }
       }
@@ -30,29 +33,34 @@ exports.api = function api() {
           results[i][j] = '';
         }
       }
-      lines.forEach(function (line) {
-        let proc = line.substring(0, 26),
-          pid =  line.substring(26, 35),
-          util1 =  line.substring(66, 69),
-          util2 =  line.substring(70, 73);
+      
+      try {
+        lines.forEach(function (line) {
+          let proc = line.substring(0, 26),
+            pid =  line.substring(26, 35),
+            util1 =  line.substring(66, 69),
+            util2 =  line.substring(70, 73);
 
-        if (numline > 2) {
-          if (proc) {
-            results[numline - 2][0] = proc;
-            results[numline - 2][1] = pid;
-            results[numline - 2][2] = util1 + util2;
+          if (numline > 2) {
+            if (proc) {
+              results[numline - 2][0] = proc;
+              results[numline - 2][1] = pid;
+              results[numline - 2][2] = util1 + util2;
+            }
           }
-        }
-        numline += 1;
-      });
-
+          numline += 1;
+        });
+      } catch(err) {
+        console.log( err.message);
+        console.log('catch de la ligne 37');
+      }
       res.type('text/plain');
       res.send(results);
 
       lines = null;
       results = null;
       numline = null;
-
+      
     });
   });
 app.listen(1000);
