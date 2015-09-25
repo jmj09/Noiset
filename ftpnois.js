@@ -1,9 +1,9 @@
 /*jslint node: true */
 'use strict';
-
+/*ftpprime();
 setInterval(function () {
 ftpprime();
-}, 60000);//2'
+}, 60000);//2'*/
 
 //exports.put = 
 (function ftpprime() {
@@ -29,7 +29,7 @@ ftpprime();
           processError('ftpprime-on', err, 28);
           clftp.destroy();
         }
-        console.log(myfiles[0]);
+        //console.log(myfiles[0]);
         (myfiles = myfiles.slice(1)).length && ftpnext();
       });
     })();
@@ -38,7 +38,7 @@ ftpprime();
   });
   
   clftp.on('error', function (err) {
-    processError('Error',err,41);
+    processError('Error',err,43);
     clftp.destroy();
     return(0);
   });
@@ -54,6 +54,7 @@ ftpprime();
     keepalive: 10000
   });
   //console.log('connect');
+  setTimeout(ftpprime, 60000);
 })();
 
 function processError(funcName, err, ligne){
