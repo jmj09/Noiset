@@ -84,7 +84,7 @@ function writeRain(raindrop) {
 
 //exports.get = 
 function getRain() {
-  const strURL1 = 'http://noiset.homeserver.com:81/JSON?request=getstatus&ref=42';
+  const strURL1 = 'http://localhost:81/JSON?request=getstatus&ref=42';
   let request = require('request');
   // Configure the request
   // Set the headers
@@ -99,7 +99,7 @@ function getRain() {
   };
   // Start the request
   request(options, function (error, response, body) {
-    if (error) { throw error; }
+    if (error) { return 0; }
     if (!error && response.statusCode === 200) {
       let rainQ = JSON.parse(body).Devices[0].value;
       rainQ = Math.round(rainQ * 10) / 10;
@@ -121,7 +121,7 @@ function writeNewFile() {
   lines.forEach(function (v) {
     fs.writeSync(fdesc, (v) + '\r\n');
   });
-  fs.close(fdesc);
+  fs.closeSync(fdesc);
   fs = undefined;  
 }
 

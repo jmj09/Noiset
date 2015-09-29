@@ -1,5 +1,6 @@
 ﻿/*jslint node: true */
 'use strict';
+process.env.NODE_ENV = 'development';
 
 //init global let
 let spi = 0;
@@ -28,7 +29,7 @@ function writefile(myVal) {
   let fs = require('fs');
   let madate = dateFormat(Date.now(), 'yyyy/mm/dd HH:MM:ss')
   //console.log(myVal);
-  let texte = `${madate} ${sep}${myVal[0]}${sep}${myVal[1]}${sep}${myVal[2]}${sep}${myVal[3]}${sep}${myVal[4]}${sep}${myVal[5]}\r\n`;
+  let texte = `${madate}${sep}${myVal[0]}${sep}${myVal[1]}${sep}${myVal[2]}${sep}${myVal[3]}${sep}${myVal[4]}${sep}${myVal[5]}\r\n`;
   //console.log(texte);
   fs.appendFile(path1, texte, function (err) {
     if (err) {
@@ -51,12 +52,11 @@ function writefile(myVal) {
         });
         fs.close(fdesc);
         //console.log('c');
-        myArray = undefined;
-        fs = undefined;
+        myArray.length = 0;
+        /*fs = undefined;
         dateFormat = undefined;
         texte = undefined;
-        madate = undefined;
-        myArray = undefined;
+        madate = undefined;*/
       })
     });
   });
@@ -77,13 +77,13 @@ function adapt(myAdaptVal) {
 function getnext() {
   //console.log('a');
   let request = require('request');
-  const strURL = 'http://noiset.homeserver.com:81/JSON?request=getstatus&ref=';
+  const strURL = 'http://localhost:81/JSON?request=getstatus&ref=';
   let capteurs = [460, 291, 38, 515, 605, 288];
   //'Balcon Rfx.Os1.Temp';'Sejour Rfx.Os5.Temp';'Chambre Rfx.Os2.Temp';
   //'SdB Aeon.Radar.Temp';'Sejour Aeon.Radar.Luminance';'Sejour Rfx.Os5.Barometer';
   const headers = {
     'User-Agent': 'Super Agent/0.0.1',
-    'Content-Type': 'application/x-www-form-urlencoded'
+    'Content-Type': 'application/json'
   };
   let options = {
     url: strURL + capteurs[spi],

@@ -80,7 +80,6 @@ function memonois() {
       let ttlngi = 0;
       let ttlhs3 = 0;
       bar.forEach(function (entry) {
-
         switch (entry[0].substring(0, 3)) {
           case 'nod':
             ttlioj += parseInt(entry[2], 10);
@@ -119,7 +118,12 @@ function memonois() {
           fs.close(fdesc);
           request = undefined;
           fs = undefined;
-          dateFormat = undefined;
+          /*dateFormat = undefined;
+          fdesc = undefined;
+          fin = undefined;
+          myarray = undefined;
+          bar = undefined;
+          data = undefined;*/
         });
       });
     }

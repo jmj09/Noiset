@@ -11,7 +11,7 @@ const path1 = 'ener.csv';
 const path2 = 'ener24.csv';
 //const path1 = 'C:\\Users\\jeanmarc\\Documents\\ener.csv';
 //const path2 = 'C:\\Users\\jeanmarc\\Documents\\ener24.essai.csv';
-const strURL1 = 'http://noiset.homeserver.com:81/JSON?request=getstatus&ref=' + capteur1;
+const strURL1 = 'http://localhost:81/JSON?request=getstatus&ref=' + capteur1;
 // Set the headers
 const headers = {
   'User-Agent': 'Super Agent/0.0.1',
@@ -101,7 +101,7 @@ function getEner() {
   //console.log('avant');
   request(options, function (error, response, body) {
   //console.log(body);
-  if (error) { throw error; }
+  if (error) { return 0;}
   if (!error && response.statusCode === 200) {
     let ener = JSON.parse(body).Devices[0].value;
     writeEner(ener);

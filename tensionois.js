@@ -6,9 +6,9 @@ var capteur1 = 618; // "Sejour Soilhum-1";
 var capteur2 = 620; // "Sejour Soilhum-2";
 var capteur3 = 616; // "Sejour Soilhum-3";
 var hum1, hum2, hum3;
-var strURL1 = "http://noiset.homeserver.com:81/JSON?request=getstatus&ref=" + capteur1;
-var strURL2 = "http://noiset.homeserver.com:81/JSON?request=getstatus&ref=" + capteur2;
-var strURL3 = "http://noiset.homeserver.com:81/JSON?request=getstatus&ref=" + capteur3;
+var strURL1 = "http://localhost:81/JSON?request=getstatus&ref=" + capteur1;
+var strURL2 = "http://localhost:81/JSON?request=getstatus&ref=" + capteur2;
+var strURL3 = "http://localhost:81/JSON?request=getstatus&ref=" + capteur3;
 // Set the headers
 var headers = {
   'User-Agent': 'Super Agent/0.0.1',
