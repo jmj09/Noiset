@@ -45,7 +45,7 @@ function ftpprime() {
     port: 21,
     secure: false,
     user: 'meteo.noiset',
-    password: '17321414',
+    password: '********',
     connTimeout: 10000,
     pasvTimeout: 10000,
     keepalive: 10000
