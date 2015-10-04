@@ -31,7 +31,6 @@ function ftpprime() {
         }
       });
     })();
-
   });
   
   clftp.on('error', function (err) {
@@ -45,7 +44,7 @@ function ftpprime() {
     port: 21,
     secure: false,
     user: 'meteo.noiset',
-    password: '********',
+    password: '17321414',
     connTimeout: 10000,
     pasvTimeout: 10000,
     keepalive: 10000
