@@ -5,14 +5,14 @@
 /* file copy a file list decrementing file name */
 /* from 300 to 1.jpg should rename instead      */
 /************************************************/
-function jimpjs(){
+function decrement(){
   let myfiles = [];
   myfiles = Array.from(new Array(300), (x,i) => i+1);
   (function writeNext() {
     let fse = require('fs.extra');
     fse.copy('netcam/' + myfiles[1] + '.jpg', 'netcam/' + myfiles[0] + '.jpg', { replace: true }, function (err) {
       if (err) { console.log('mon erreur ' + err);}// i.e. file absent
-      //console.log(myfiles[0]);
+      //if (myfiles.length === 5) {console.log(myfiles[0]);}
       (myfiles = myfiles.slice(1)).length - 1 && writeNext();
       fse = null;
     });
@@ -26,12 +26,16 @@ function jimpjs(){
 function update(){
   let Jimp = require('jimp');
   Jimp.read('netcam/CurrentImage.jpg').then(function (current) {
-      current.resize(1000, 600)      // resize
-           .quality(50)              // set JPEG quality
-           .write('netcam/300.jpg'); // save
+    current.resize(1000, 600)      // resize
+      .quality(50);                // set JPEG quality
+    current.write('netcam/300.jpg',function () {
+      //console.log('fic 300 ok');
+      decrement();
+      Jimp = null;
+    });                           // save
   }).catch(function (err) {
       console.error(err);
-  });
+   });
 }
 
 /************************************************/
@@ -39,9 +43,7 @@ function update(){
 /* copy file and decrement file names           */
 /************************************************/
 let onFileChange = require('on-file-change');
-onFileChange('netcam/CurrentImage.jpg', function()
-{
-    //console.log('fired');
-    update();
-    jimpjs();
+onFileChange('netcam/CurrentImage.jpg', function(){
+  //console.log('fired');
+  update();
 });
