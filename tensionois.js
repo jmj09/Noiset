@@ -1,5 +1,4 @@
-/*jslint node: true */
-'use strict';
+/*eslint-env node*/
 
 //init var
 var capteur1 = 618; // "Sejour Soilhum-1";
@@ -11,14 +10,15 @@ var strURL2 = "http://localhost:81/JSON?request=getstatus&ref=" + capteur2;
 var strURL3 = "http://localhost:81/JSON?request=getstatus&ref=" + capteur3;
 // Set the headers
 var headers = {
-  'User-Agent': 'Super Agent/0.0.1',
-  'Content-Type': 'application/x-www-form-urlencoded'
+  "User-Agent": "Super Agent/0.0.1",
+  "Content-Type": "application/x-www-form-urlencoded"
 };
-var request = require('request');
+var request = require("request");
 
 function writefile() {
-  var fs = require('fs');
-  var dateFormat = require('dateformat');
+  "use strict";
+  var fs = require("fs");
+  var dateFormat = require("dateformat");
   var madate = dateFormat(Date.now(), "yyyy/mm/dd HH:MM:ss");
   var path1 = "tensio.csv";
   //var path1 = "C:\\Users\\jeanmarc\\Documents\\tensio.csv";
@@ -38,10 +38,11 @@ function writefile() {
 }
 
 function get3() {
+  "use strict";
   // Configure the request
   var options = {
     url: strURL3,
-    method: 'GET',
+    method: "GET",
     headers: headers
   };
   // Start the request
@@ -55,10 +56,11 @@ function get3() {
 }
 
 function get2() {
+  "use strict";
   // Configure the request
   var options = {
     url: strURL2,
-    method: 'GET',
+    method: "GET",
     headers: headers
   };
   // Start the request
@@ -72,12 +74,13 @@ function get2() {
   });
 }
 
-//exports.get = 
+//exports.get =
 function get1() {
+  "use strict";
   // Configure the request
   var options = {
     url: strURL1,
-    method: 'GET',
+    method: "GET",
     headers: headers
   };
   // Start the request
@@ -96,7 +99,7 @@ function get1() {
 get1();
 // expecting something close to 1h
 setInterval(function () {
+  "use strict";
   get1();
 }, 3605000);
 /*3 600 000 ms = 1h */
-

@@ -1,30 +1,23 @@
-/*jslint node: true */
-'use strict';
-// expecting something close to 6h
-cruedor();
-setInterval(function () {
-  cruedor();
-}, 21600000);
-/*21600000ms = 6h */
-
-//exports.get = 
+/*eslint node: true */
+//exports.get =
 function cruedor() {
-  let request = require('request');
-  let fs = require('fs');
-  let dateFormat = require('dateformat');
-  
+  "use strict";
+  let request = require("request");
+  let fs = require("fs");
+  let dateFormat = require("dateformat");
+
   const strURL = "http://www.vigicrues.gouv.fr/niveau3.php?idstation=415&idspc=14&typegraphe=h&AffProfondeur=72&AffRef=auto&AffPrevi=non&nbrstations=1&ong=2";
-   
+
   // Set the headers
   const headers = {
-    'User-Agent': 'Super Agent/0.0.1',
-    'Content-Type': 'application/x-www-form-urlencoded'
+    "User-Agent": "Super Agent/0.0.1",
+    "Content-Type": "application/x-www-form-urlencoded"
   };
 
   // Configure the request
   const options = {
     url: strURL,
-    method: 'GET',
+    method: "GET",
     headers: headers
   };
 
@@ -68,3 +61,10 @@ function cruedor() {
     }
   });
 }
+
+// expecting something close to 6h
+cruedor();
+setInterval(function () {
+  cruedor();
+}, 21600000);
+/*21600000ms = 6h */

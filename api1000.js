@@ -1,26 +1,20 @@
-/*jslint node: true */
-'use strict';
-// a revoir
-let express = require('express');
-let app = express();
-let exec = require('child_process').exec;
-let child;
+/*eslint-env node*/
+var express = require("express");
+var app = express();
+var exec = require("child_process").exec;
+var child;
 const options = {
-  timeout: 1000,
-  killSignal: 'SIGKILL'
+  timeout: 5000,
+  killSignal: "SIGKILL"
 };
-//Authorization: Basic am1qOjE3MzI=
-//let re req.setRequestHeader("Authorization", "Basic am1qOjE3MzI=");
-// Add private api get proxying
-app.get('/rss', function (req, res) {
-  //console.log('enter get');
-  //console.log(req.headers);
 
-  child = exec('tasklist', options, function (err, stdout, stderr) {
+app.get("/rss", function (req, res) {
+  "use strict";
+  child = exec("tasklist", options, function (err, stdout, stderr) {
     if (err) {
-      if (err) {throw err; }
+      return 0;
     }
-    let lines = stdout.toString().split('\n'),
+    let lines = stdout.toString().split("\n"),
       results = new Array(100),
       i,
       numline = 0,
@@ -28,16 +22,16 @@ app.get('/rss', function (req, res) {
     for (i = 0; i < 100; i += 1) {
       results[i] = new Array(3);
       for (j = 0; j < 3; j += 1) {
-        results[i][j] = '';
+        results[i][j] = "";
       }
     }
-    
+
     try {
       lines.forEach(function (line) {
         let proc = line.substring(0, 26),
-          pid =  line.substring(26, 35),
-          util1 =  line.substring(66, 69),
-          util2 =  line.substring(70, 73);
+          pid = line.substring(26, 35),
+          util1 = line.substring(66, 69),
+          util2 = line.substring(70, 73);
 
         if (numline > 2) {
           if (proc) {
@@ -50,19 +44,15 @@ app.get('/rss', function (req, res) {
       });
     } catch(err) {
       //console.log( err.message);
-      //console.log('catch de la ligne 37');
+      //console.log("catch de la ligne 47");
     }
-    //res.type('text/plain');
+    //res.type("text/plain");
     res.json(results);
-    lines = null;
-    results = null;
-    numline = null;
-    
+    lines.length = 0;
+    results.length = 0;
+
   });
 });
 
 app.listen(1000);
 //console.log("listening on port 1000");
-
-
-
