@@ -1,5 +1,5 @@
 ﻿/*eslint-env node*/
-process.env.NODE_ENV = "production";
+//process.env.NODE_ENV = "production";
 //init global let
 var spi = 0;
 var myNextVal = [];

@@ -1,29 +1,26 @@
 /*eslint-env node*/
-
-//init var
-var capteur1 = 618; // "Sejour Soilhum-1";
-var capteur2 = 620; // "Sejour Soilhum-2";
-var capteur3 = 616; // "Sejour Soilhum-3";
-var hum1, hum2, hum3;
-var strURL1 = "http://localhost:81/JSON?request=getstatus&ref=" + capteur1;
-var strURL2 = "http://localhost:81/JSON?request=getstatus&ref=" + capteur2;
-var strURL3 = "http://localhost:81/JSON?request=getstatus&ref=" + capteur3;
+"use strict";
+//init let
+let hum1, hum2, hum3;
+const strURL1 = "http://localhost:81/JSON?request=getstatus&ref=618";// "Sejour Soilhum-1";
+const strURL2 = "http://localhost:81/JSON?request=getstatus&ref=620";// "Sejour Soilhum-2";
+const strURL3 = "http://localhost:81/JSON?request=getstatus&ref=616";// "Sejour Soilhum-3";
 // Set the headers
-var headers = {
+const headers = {
   "User-Agent": "Super Agent/0.0.1",
   "Content-Type": "application/x-www-form-urlencoded"
 };
-var request = require("request");
+let request = require("request");
 
 function writefile() {
   "use strict";
-  var fs = require("fs");
-  var dateFormat = require("dateformat");
-  var madate = dateFormat(Date.now(), "yyyy/mm/dd HH:MM:ss");
-  var path1 = "tensio.csv";
-  //var path1 = "C:\\Users\\jeanmarc\\Documents\\tensio.csv";
-  var sep = ",";
-  var texte = madate + sep + hum1 + sep + hum2 + sep + hum3 + "\r\n";
+  let fs = require("fs");
+  let dateFormat = require("dateformat");
+  let madate = dateFormat(Date.now(), "yyyy/mm/dd HH:MM:ss");
+  const path1 = "tensio.csv";
+  //let path1 = "C:\\Users\\jeanmarc\\Documents\\tensio.csv";
+  const sep = ",";
+  const texte = madate + sep + hum1 + sep + hum2 + sep + hum3 + "\r\n";
   //console.log(texte);
   try {
     fs.appendFile(path1, texte, function (err) {
@@ -40,7 +37,7 @@ function writefile() {
 function get3() {
   "use strict";
   // Configure the request
-  var options = {
+  let options = {
     url: strURL3,
     method: "GET",
     headers: headers
@@ -58,7 +55,7 @@ function get3() {
 function get2() {
   "use strict";
   // Configure the request
-  var options = {
+  let options = {
     url: strURL2,
     method: "GET",
     headers: headers
@@ -78,7 +75,7 @@ function get2() {
 function get1() {
   "use strict";
   // Configure the request
-  var options = {
+  let options = {
     url: strURL1,
     method: "GET",
     headers: headers
