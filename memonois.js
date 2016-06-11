@@ -1,13 +1,13 @@
 /*eslint-env node*/
 
 //remove line
-function removeLi(arr) {
+function removeLine(arr) {
   "use strict";
   return arr.filter(function (el) { return (el[0].substring(0, 4) === "node" || el[0].substring(0, 4) === "HSPI" || el[0].substring(0, 4) === "HS3."); });
 }
 
 //remove col
-function removeEl(array, remIdx) {
+function removeCol(array, remIdx) {
   "use strict";
   return array.map(function (arr) {
     return arr.filter(function (idx) { return idx !== remIdx; });
@@ -23,7 +23,7 @@ function sortByCol0(a, b) {
 }
 
 //remove empty line based on first col
-function splike(arr) {
+function removeEmptyLine(arr) {
   "use strict";
   for (let i = 0; i < arr.length; i++) {
     if (arr[i][0] === "") {
@@ -34,46 +34,40 @@ function splike(arr) {
 }
 
 //main func
-//exports.get =
-function memonois() {
+(function memonois() {
   "use strict";
-  //console.log("memonois");
-  let request = require("request");
-  let fs = require("fs");
-  let dateFormat = require("dateformat");
+  const requestP = require('request-promise');
+  const fs = require("fs");
+  const dateFormat = require("dateformat");
+  const myF = require('./noisetfunc.js');
   const sep = ",";
   let texte = "";
-  let madate = dateFormat(Date.now(), "yyyy/mm/dd HH:MM:ss");
+  const madate = dateFormat(Date.now(), "yyyy/mm/dd HH:MM:ss");
   const path1 = "./mem.csv";
   const path2 = "./mem2000.csv";
-  //const path1 = "C:\\Users\\jeanmarc\\Documents\\mem.csv";
-  //const path2 = "C:\\Users\\jeanmarc\\Documents\\mem3000.csv";
+  //let path1 = "C:\\Users\\jeanmarc\\Documents\\mem.csv";
+  //let path2 = "C:\\Users\\jeanmarc\\Documents\\mem3000.csv";
 
   //configure request
   const options = {
-    url: "http://127.0.0.1:1000/rss",
+    url: "http://127.0.0.1:1000/=rss",
     method: "GET",
     headers: {
       "User-Agent": "Noiset Agent",
       "Content-Type": "application/x-www-form-urlencoded"
     }
   };
-
-  //console.log("before request");
-  request(options, function (error, response, body) {
-      if (error) { console.log("ligne 60"); return 0;}
-      //console.log(response.statusCode);
-    if (!error && response.statusCode === 200) {
-      //console.log("enter request");
-      let data = JSON.parse(body);
-
-      for (let i = 0; i < data.length; i++) {
-        splike(data);
+  requestP(options) 
+    .then(function (response) {
+      const data = JSON.parse(response);
+      const longo = data.length;
+      let i;
+      for (i = 0; i < longo; i++) {
+        removeEmptyLine(data);
       }
-
-      let bar = removeEl(data, 1);
+      let bar = removeCol(data, 1);
       bar = bar.sort(sortByCol0);
-      bar = removeLi(bar);
+      bar = removeLine(bar);
       let bcl = 1;
       //console.log(bar);
       bar.forEach(function (entry) {
@@ -103,10 +97,14 @@ function memonois() {
       //console.log(texte);
       fs.appendFile(path1, texte, function (err) {
         if (err) {
-          return console.log(err);
+          processError("memonois", err, 104);
+          return 0;
         }
         fs.readFile(path1, "utf8", function (err, dotum) {
-          if (err) { return 0; }
+          if (err) {
+            processError("memonois", err, 109);
+            return 0;
+          }
           let myarray = dotum.split("\r\n");
           let fin = [];
           if (myarray.length > 3000) {
@@ -115,13 +113,11 @@ function memonois() {
             fin = myarray;
           }
           fin[0] = "date,node,HSPI,hs3";
-          let fdesc = fs.openSync(path2, "w");
+          const fdesc = fs.openSync(path2, "w");
           fin.forEach(function (v) {
             fs.writeSync(fdesc, (v) + "\r\n");
           });
           fs.close(fdesc);
-          request = undefined;
-          fs = undefined;
           /*dateFormat = undefined;
           fdesc = undefined;*/
           fin.length = 0;
@@ -130,10 +126,9 @@ function memonois() {
           data = undefined;*/
         });
       });
-    }
-  });
-  return;
-}
-
-memonois();
-setInterval(function () { memonois(); }, 300000);
+    })
+    .catch(function (err) {
+      myF.processError('cruedor request ', err, 33);
+    });
+  setTimeout(memonois, 1200000);
+})();

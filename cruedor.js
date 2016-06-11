@@ -1,19 +1,18 @@
-/*eslint node: true */
-//exports.get =
-function cruedor() {
+/*eslint-env node*/
+"use strict";
+
+(function cruedor() {
   "use strict";
-  let request = require("request");
-  let fs = require("fs");
-  let dateFormat = require("dateformat");
-
-  const strURL = "http://www.vigicrues.gouv.fr/niveau3.php?idstation=415&idspc=14&typegraphe=h&AffProfondeur=72&AffRef=auto&AffPrevi=non&nbrstations=1&ong=2";
-
+  const requestP = require('request-promise');
+  const dateFormat = require("dateformat");
+  const myF = require('./noisetfunc.js');
+  const fs = require("fs");
+  const strURL = "http://www.vigicrues.gouv.fr/niveau3.php?CdStationHydro=P514001001&CdEntVigiCru=14&typegraphe=h&AffProfondeur=168&AffRef=tous&AffPrevi=non&nbrstations=1&ong=2";
   // Set the headers
   const headers = {
     "User-Agent": "Super Agent/0.0.1",
     "Content-Type": "application/x-www-form-urlencoded"
   };
-
   // Configure the request
   const options = {
     url: strURL,
@@ -22,49 +21,26 @@ function cruedor() {
   };
 
   // Start the request
-  request(options, function (error, response, body) {
-    if (!error && response.statusCode === 200) {
-
-      //exxtract regexp height from answer body
-      let re = new RegExp("Bergerac(.*?)'right'>([0-9 \.]+)", "gmi");
-      let strOutput = re.exec(body);
-      let txtFormatted = strOutput[2];
-
-      let path = "crue.csv";
+  requestP(options) 
+    .then(function (response) {
+      //extract regexp height from answer response
+      const re = new RegExp("Bergerac(.*?)'right'>([0-9 \.]+)", "gmi");
+      const strOutput = re.exec(response);
+      const txtFormatted = strOutput[2];
+      const path = "crue.csv";
       //let path = "C:\\Users\\jeanmarc\\Documents\\crue.csv"
       const sep = ",";
-      let d = new Date();
-      let n = dateFormat(d, "yyyy/mm/dd HH:MM:ss");
-      //& "/" & d.getMonth.toString & "/" & d.getDate.toString & " " & d.getHours.toString & ":" & d.getMinutes.toString & ":" & d.getSeconds.toString;
-      let line = `${n}${sep}${txtFormatted}\r\n`;
+      const d = new Date();
+      const n = dateFormat(d, "yyyy/mm/dd HH:MM:ss");
+      const line = `${n}${sep}${txtFormatted}\r\n`;
       fs.appendFile(path, line, function (err) {
         if (err) {
-          return console.log(err);
+          myF.processError("appendFile", err, 37);
         }
-        //console.log("done");
       });
-
-      request.close;
-      request.delete;
-      request = undefined;
-      fs.close;
-      fs.delete;
-      fs = undefined;
-      re.close;
-      re = undefined;
-      strOutput = undefined;
-      txtFormatted = undefined;
-      line = undefined;
-      path = undefined;
-      d = undefined;
-      n = undefined;
-    }
-  });
-}
-
-// expecting something close to 6h
-cruedor();
-setInterval(function () {
-  cruedor();
-}, 21600000);
-/*21600000ms = 6h */
+    })
+    .catch(function (err) {
+      myF.processError('cruedor request ', err, 24);
+    });
+      setTimeout(cruedor, 21600000); //6h
+})();

@@ -1,144 +1,51 @@
 /*eslint-env node*/
+//init let-const
+'use strict';
+const capteur1 = 786; //'Owl.Ener.Cumul.Day';
+const path1 = 'ener.csv';
+const path2 = 'ener24.csv';
+//const path1 = 'C:\\Users\\jeanmarc\\Documents\\ener.csv';
+//const path2 = 'C:\\Users\\jeanmarc\\Documents\\ener24.essai.csv';
+const strURL1 = 'http://localhost:81/JSON?request=getstatus&ref=' + capteur1;
 
-//init let
-var dateFormat = require("dateformat");
-var capteur1 = 175; //"Owl.Ener.Cumul.Day";
-const sep = ",";
-var texte = "";
-
-const path1 = "ener.csv";
-const path2 = "ener24.csv";
-//const path1 = "C:\\Users\\jeanmarc\\Documents\\ener.csv";
-//const path2 = "C:\\Users\\jeanmarc\\Documents\\ener24.essai.csv";
-const strURL1 = "http://localhost:81/JSON?request=getstatus&ref=" + capteur1;
 // Set the headers
 const headers = {
-  "User-Agent": "Super Agent/0.0.1",
-  "Content-Type": "application/x-www-form-urlencoded"
+  'User-Agent': 'Super Agent/0.0.1',
+  'Content-Type': 'application/x-www-form-urlencoded'
 };
-
-function eraseLastline(file) {
-  "use strict";
-  let fs = require("fs");
-  let data = fs.readFileSync(file, "utf8");
-  let array = data.toString().split("\r\n");
-  array = array.slice(0, array.length - 2);
-  let fdesc = fs.openSync(file, "w");
-  array.forEach(function (v) {
-  fs.writeSync(fdesc, (v) + "\r\n");
-  });
-  fs.closeSync(fdesc);
-  fs = undefined;
-}
-
-function writeEnerday(energy) {
-  "use strict";
-  let fs = require("fs");
-  let madate = dateFormat(Date.now(), "yyyy/mm/dd") + " 00:00:00";
-  texte = madate + sep + energy + "\r\n";
-  fs.appendFileSync(path1, texte);
-  fs = undefined;
-}
-
-function writeEnerhour(energy) {
-  "use strict";
-  let fs = require("fs");
-  let myhr = dateFormat(Date.now(), "HH");
-  let lines = fs.readFileSync(path2, "utf8");
-  let lineArray = lines.toString().split("\r\n");
-  let myModif = parseInt(myhr);
-  lineArray[myModif + 1] = myModif + sep + energy;
-  let fdesc = fs.openSync(path2, "w");
-  lineArray.forEach(function (v) {
-  fs.writeSync(fdesc, (v) + "\r\n");
-  });
-  fs.closeSync(fdesc);
-  fs = undefined;
-}
-
-function getCumul() {
-  "use strict";
-  let fs = require("fs");
-  let myhr = dateFormat(Date.now(), "HH");
-  let myModif = parseInt(myhr);
-  let lines = fs.readFileSync(path2, "utf8");
-  let lineArr = lines.split("\r\n");
-  let total = 0;
-  let i;
-  for (i = 1; i < myModif + 1; i++) {
-    let interm = lineArr[i].split(",");
-    let sstot = interm[1];
-    total += parseInt(sstot, 10);
-  }
-  //console.log(total);
-  fs = undefined;
-  return total;
-}
-
-function writeNewFile() {
-  "use strict";
-  let fs = require("fs");
-  let lines = [];
-  let fdesc = fs.openSync(path2, "w");
-  for (let i = 0; i < 25; i++) {
-    if (i === 0) {
-      lines[0] = "heure,kWh";
-    } else {
-      lines[i] = i + sep + "0";
-    }
-    fs.writeSync(fdesc, lines[i] + "\r\n");
-  }
-  fs.closeSync(fdesc);
-  fs = undefined;
-}
-
-function writeEner(energy) {
-  "use strict";
-  let madate = Date.now();
-  let mntes = parseInt(dateFormat(madate, "MM"), 10);
-  let hres = parseInt(dateFormat(madate, "HH"), 10);
-  if ((hres === 0) && (mntes < 5)) {
-    writeNewFile();
-    writeEnerhour(energy - getCumul());
-    writeEnerday(energy);
-  } else {
-    eraseLastline(path1);
-    writeEnerhour(energy - getCumul());
-    writeEnerday(energy);
-  }
-}
-
-//exports.get =
-function getEner() {
-  "use strict";
-  let request = require("request");
-  // Configure the request
-  let options = {
-    url: strURL1,
-    method: "GET",
-    headers: headers
-  };
-  // Start the request
-  //console.log("avant");
-  request(options, function (error, response, body) {
-  //console.log(body);
-  if (error) { return 0;}
-  if (!error && response.statusCode === 200) {
-    let ener = JSON.parse(body).Devices[0].value;
-    writeEner(ener);
-  }
-  });
-  // Releases memory
-  request = undefined;
-}
-
+const options = {
+  url: strURL1,
+  method: 'GET',
+  headers: headers
+};
+const requestP = require('request-promise');
+const myF = require('./noisetfunc.js');
+const schedule = require('node-schedule');
 
 // launch action
+const jobFiveMin = schedule.scheduleJob('10 4,9,14,19,24,29,34,39,44,49,54,59 * * * *', function(){
+  const dateFormat = require('dateformat');
+  requestP(options)
+  .then(function (response) {
+    const ener = JSON.parse(response).Devices[0].value;
+    myF.eraseLastLine(path1);
+    myF.writeValHour(path2, +dateFormat(Date.now(), 'HH'), ener - myF.getCumul(path2, +dateFormat(Date.now(), 'HH')));
+    myF.writeValDay(path1, ener);
+  })
+  .catch(function (err) {
+    myF.processError('jobFiveMin request ', err, 31);
+  });
+});
 
-getEner();
-
-setInterval(function () {
-  "use strict";
-  getEner();
-}, 300000);
-/*300000ms = 5" */
+const jobOnceADay = schedule.scheduleJob('10 1 0 * * *', function(){
+  requestP(options)
+  .then(function (response) {
+    const firstLine= 'heure,kWh\r\n';
+    const ener = JSON.parse(response).Devices[0].value;
+    myF.writeNewFile(path2, firstLine);
+    myF.writeValDay(path1, ener);
+  })
+  .catch(function (err) {
+    myF.processError('jobOnceADay request', err, 56);
+  });
+});

@@ -1,36 +1,51 @@
+/*eslint-env node*/
+"use strict";
+(function () {
+  const onFileChange = require("on-file-change");
+  onFileChange("netcam/CurrentImage.jpg", () => {
+    update();
+  });
+})();
+
+function copyFile(source, target) {
+  "use strict";
+  return new Promise((resolve, reject) => {
+    const fs = require("fs");
+    const rd = fs.createReadStream(source);
+    rd.on('error', reject);
+    const wr = fs.createWriteStream(target);
+    wr.on('error', reject);
+    wr.on('finish', resolve);
+    rd.pipe(wr);
+  });
+}
+
 function decrement(){
   "use strict";
-  let myfiles = [];
-  myfiles = Array.from(new Array(300), (x,i) => i+1);
+  let i = 0, myfiles = [];
+  const max = 300;
+  for(i = 1; myfiles.push(i++) < max;);
   (function writeNext() {
-    let fse = require("fs.extra");
-    fse.copy("netcam/" + myfiles[1] + ".jpg", "netcam/" + myfiles[0] + ".jpg", { replace: true }, function (err) {
-      if (err) { console.log("mon erreur " + err);}// i.e. file absent
-      //if (myfiles.length === 5) {console.log(myfiles[0]);}
-      (myfiles = myfiles.slice(1)).length - 1 && writeNext();
-      fse = null;  
-    });
+    copyFile("netcam/" + myfiles[1] + ".jpg", "netcam/" + myfiles[0] + ".jpg")
+    .then (() => {(myfiles = myfiles.slice(1)).length - 1 && writeNext();})
+    .catch((err) => {return err;});
   })();
 }
 
 function update(){
   "use strict";
-  let Jimp = require("jimp");
-  Jimp.read("netcam/CurrentImage.jpg").then(function (current) {
+  const myF = require('./noisetfunc.js');
+  const Jimp = require("jimp");
+  Jimp.read("netcam/CurrentImage.jpg").then((current) => {
     current.resize(1000, 600)      // resize
       .quality(50);                // set JPEG quality
-    current.write("netcam/300.jpg",function () {
+    current.write("netcam/300.jpg", () => {
       //console.log("fic 300 ok");
-      decrement();
-      Jimp = null;
+    const valErr = decrement();
+    if(valErr) {myF.processError("update decrement : ", valErr, 14);}
+      //Jimp = null;
     });                           // save
-  }).catch(function (err) {
-      console.error(err);
+  }).catch((err) => {
+      myF.processError("update", err, 18);
    });
 }
-
-var onFileChange = require("on-file-change");
-onFileChange("netcam/CurrentImage.jpg", function(){
-  //console.log("fired");
-  update();
-});

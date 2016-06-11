@@ -1,39 +1,31 @@
-//exports.put =
+/*eslint-env node*/
 
-function processError(funcName, err, ligne){
+(function ftpProcess() {
   "use strict";
-  let dateFormat = require("dateformat");
-  let d = new Date();
-  let n = dateFormat(d, "yyyy/mm/dd HH:MM:ss");
-  console.log(`${funcName} - ligne ${ligne} : ${n} at ${err}`);
-  //setTimeout(function () {}, 10000);
-}
-
-function ftpprime() {
-  "use strict";
-//console.log("enter ftpprime");
-  let Client = require("ftp");
-  let fs = require("fs");
-  let clftp = new Client();
-  //clftp.setMaxListeners(0); // unlimited listeners
+  const Client = require("ftp");
+  const myF = require('./noisetfunc.js');
+  const clftp = new Client();
 
   clftp.on("ready", function () {
-    //console.log("ready event");
     let myfiles = ["annot", "crue", "ener", "ener24", "mem2000", "pluie", "pluie24", "tensio", "temp5000"];
     (function ftpnext() {
+      const fs = require("fs");
       fs.access(myfiles[0] + ".csv", function (err) {
         if (err) {
-          processError("file access pb ", err, 26);
+          myF.processError("file access pb ", err, 13);
           myfiles = myfiles.slice(1);
           ftpnext();
         } else {
           clftp.put(myfiles[0] + ".csv", myfiles[0] + ".csv", function (err) {
-            //console.log(myfiles[0]);
             if (err) {
-            processError("file access pb ", err, 33);
+              myF.processError("clftp.put ", err, 19);
+              clftp.end();
             }
-            (myfiles = myfiles.slice(1)).length && ftpnext();
-            if(!myfiles.length) {clftp.end();}
+            else {
+              (myfiles = myfiles.slice(1)).length && ftpnext();
+              //console.log("done " + myfiles[0]);
+              if(!myfiles.length) {clftp.end();}
+            }
           });
         }
       });
@@ -41,7 +33,7 @@ function ftpprime() {
   });
 
   clftp.on("error", function (err) {
-    processError("Error",err,37);
+    myF.processError("clftp.on",err,32);
     clftp.destroy();
     return(0);
   });
@@ -56,12 +48,5 @@ function ftpprime() {
     pasvTimeout: 10000,
     keepalive: 10000
   });
-
-  //setTimeout(ftpprime, 300000);
-};
-
-
-ftpprime();
-setInterval(function () {
-ftpprime();
-}, 300000);//2"
+  setTimeout(ftpProcess, 300000);
+})();
