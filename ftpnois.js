@@ -5,11 +5,11 @@
   const Client = require("ftp");
   const myF = require('./noisetfunc.js');
   const clftp = new Client();
-
+  const fs = require("fs");
   clftp.on("ready", function () {
     let myfiles = ["annot", "crue", "ener", "ener24", "mem2000", "pluie", "pluie24", "tensio", "temp5000"];
     (function ftpnext() {
-      const fs = require("fs");
+      
       fs.access(myfiles[0] + ".csv", function (err) {
         if (err) {
           myF.processError("file access pb ", err, 13);

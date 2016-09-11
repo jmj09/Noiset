@@ -1,24 +1,22 @@
-/*eslint-env node*/
 "use strict";
-const express = require("express");
-const app = express();
+const restify = require('restify');
+const server = restify.createServer();
+const exec = require("child_process").exec;
+const myF = require('./noisetfunc.js');
+const util = require('util');
+const  os = require('os');
+//const exec2 = require("child_process").exec;
 
-app.listen(1000, "localhost");
-//console.log("listening on port 1000");
-
-app.get("/=rss", function (req, res) {
-  "use strict";
-  const exec = require("child_process").exec;
-  const myF = require('./noisetfunc.js');
+server.get('/=rss', function (req, res) {
+  
   const options = {
     timeout: 5000,
     killSignal: "SIGKILL"
   };
   exec("tasklist", options, function (err, stdout, stderr) {
     if (err) {
-      myF.processError("exec", err, 15);
-      myF.processError("exec-bis", stderr, 15);
-      return 0;
+      myF.processError("exec err = ", err + " et stderr = "  + stderr, 12);
+      res.send(0);
     }
     const lines = stdout.toString().split("\n"),
       results = [];
@@ -33,45 +31,67 @@ app.get("/=rss", function (req, res) {
     } catch(err) {
       myF.processError("catch", err, 55);
     }
-    res.json(results);
+    res.send(results);
   });
 });
 
-app.get("/=cpu", function (req, res) {
-  "use strict";
+server.get('/=cpu', function(req, res) {
   const CPUout = process.cpuUsage();
-  var CPUUSER = + (parseFloat(CPUout.user) / 1000000).toFixed(2);
-  var CPUSYST = + (parseFloat(CPUout.system) / 1000000).toFixed(2);
-  var CPUFormat = {
+  const CPUUSER = + (parseFloat(CPUout.user) / 1000000).toFixed(2);
+  const CPUSYST = + (parseFloat(CPUout.system) / 1000000).toFixed(2);
+  const CPUFormat = {
     user: CPUUSER ,
     system: CPUSYST
   };
-  res.json(CPUFormat);
+  res.send(CPUFormat);
 });
 
-app.get("/=mem", function (req, res) {
-  "use strict";
-  const util = require('util');
-  var memRes1 = util.inspect((process.memoryUsage().rss / 1048576));
-  var memRes2 = util.inspect((process.memoryUsage().heapTotal / 1048576));
-  var memRes3 = util.inspect((process.memoryUsage().heapUsed / 1048576));
-  var memRes = {};
+server.get('/=mem', function(req, res) {
+  
+  const memRes1 = util.inspect((process.memoryUsage().rss / 1048576));
+  const memRes2 = util.inspect((process.memoryUsage().heapTotal / 1048576));
+  const memRes3 = util.inspect((process.memoryUsage().heapUsed / 1048576));
+  const memRes = {};
   memRes.rss = + parseFloat(memRes1).toFixed(2);
   memRes.heapTotal = + parseFloat(memRes2).toFixed(2);
   memRes.heapUsed = + parseFloat(memRes3).toFixed(2);
-  res.json(memRes);
+  res.send(memRes);
 });
 
-app.get("/=osc", function (req, res) {
-  "use strict";
-  const  os = require("os");
+server.get('/=osc', function(req, res) {
+  
   const osCpus = 	os.cpus();
-  res.json(osCpus);
+  res.send(osCpus);
 });
 
-app.get("/=ver", function (req, res) {
-  "use strict";
+server.get('/=ver', function(req, res) {
   const verRes = process.versions;
-  res.json(verRes);
+  res.send(verRes);
 });
 
+server.get('/=pas', function(req, res) {
+
+  const options = {
+    timeout: 5000,
+    killSignal: "SIGKILL"
+  };
+  exec("YPressure METEO get_currentValue", options, function (err, stdout, stderr) {
+    if (err) {
+      myF.processError("exec", err, 15);
+      myF.processError("exec-bis", stderr, 15);
+    res.send(0);
+    }
+    const line = stdout.toString();
+    const results = line.slice(-11,-3);
+    res.send(results);
+  });
+});
+
+server.on('uncaughtException', function(req, res, route, err) {
+  console.log("erreur api1000 ligne 87 : " + err);
+  res.send(500, "0");
+});
+
+server.listen(1000, 'localhost', function() {
+  //console.log('%s listening at %s', server.name, server.url);
+});

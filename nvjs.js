@@ -1,25 +1,25 @@
-/*eslint-env node*/
+/*eslint-env node es6*/
 /*********************************************/
 /* bar, single serie, 24h
 /*********************************************/
 function makeBar(filestring, title, subtitle){
-    "use strict";
-  let sin = [];
-  d3.csv(filestring, function (error, data) {
-    for (var i = 0; i < 23; i++) {
+  "use strict";
+  const sin = [];
+  d3.csv(filestring, (error, data)=> {
+    for (let i = 0; i < 23; i++) {
       sin.push({hour: data[i].heure, val: data[i].kWh});
     }
-    let dat = [
+    const dat = [
       {key: "Bars", values: sin}
     ];
-    let dac = document.getElementById("ttl");
+    const dac = document.getElementById("ttl");
     dac.innerHTML = '<h1>'+ title + ' ' +  subtitle + '</h1>';
-    nv.addGraph(function() {
-      let chart = nv.models.discreteBarChart()
-        .x(function(d) { return d.hour; })
-        .y(function(d) { return +d.val; })
+    nv.addGraph(()=> {
+      const chart = nv.models.discreteBarChart()
+        .x((d)=> { return d.hour; })
+        .y((d)=> { return +d.val; })
         .staggerLabels(true)
-        //.tooltips(true)
+        .tooltips(true)
         .showValues(false);
       chart.yAxis.tickFormat(d3.format('.0f'));
       chart.tooltip.enabled(true);
@@ -37,8 +37,8 @@ function makeBar(filestring, title, subtitle){
 /* Document height
 /*********************************************/
 function getDocHeight(doc) {
-    "use strict";
-  let D = doc;
+  "use strict";
+  const D = doc;
   return Math.min(
     D.body.scrollHeight, D.documentElement.scrollHeight, D.body.offsetHeight, D.documentElement.offsetHeight, D.body.clientHeight, D.documentElement.clientHeight
   );
@@ -47,12 +47,14 @@ function getDocHeight(doc) {
 /*********************************************/
 /* Adjust height chart
 /*********************************************/
-function adjust(){
-    "use strict";
-  let hauteur = getDocHeight(document) - 130;
-  let largeur = document.body.clientWidth;
-  let doc = document.getElementById("chart1");
-  let hautDef = Math.min(hauteur, largeur * 0.66);
+function adjust(madiv){
+  "use strict";
+  console.log('madiv');
+  const hauteur = getDocHeight(document) - 130;
+  const largeur = document.body.clientWidth;
+  const doc = document.getElementById(madiv);
+  console.log(doc);
+  const hautDef = Math.min(hauteur, largeur * 0.66);
   doc.style.height = hautDef + "px";
   return hautDef;
 }
@@ -61,19 +63,19 @@ function adjust(){
 /* line, single serie, selector
 /*********************************************/
 function makeLineFocus(filestring, title, subtitle){
-    "use strict";
+  "use strict";
   let sin = [];
   d3.csv(filestring, function (error, data) {
-    for (var i = 0; i < 100; i++) {
+    for (let i = 0; i < 100; i++) {
     sin.push({hour: data[i].heure, val: data[i].kWh});
     }
-    let dat = [
+    const dat = [
     {key: "Bars", values: sin}
     ];
-    let dac = document.getElementById("ttl");
+    const dac = document.getElementById("ttl");
     dac.innerHTML = '<h1>'+ title + ' ' +  subtitle + '</h1>';
     nv.addGraph(function() {
-      var chart = nv.models.lineWithFocusChart();
+      const chart = nv.models.lineWithFocusChart();
       chart.brushExtent([50,70]);
       chart.xAxis.tickFormat(d3.format(',f'));
       chart.x2Axis.tickFormat(d3.format(',f'));
@@ -154,14 +156,13 @@ function makeMultiBar(){
 /*********************************************/
 function retSync(lien) {
     "use strict";
-  var xmlhttp = new XMLHttpRequest();
+  const xmlhttp = new XMLHttpRequest();
   xmlhttp.open('GET', lien, false); // false = synchrone
   xmlhttp.send(null);
   if (xmlhttp.status === 200) {
-    var val = xmlhttp.responseText;
-    //console.log('val ' + val);
+    const val = xmlhttp.responseText;
     return val;
-    }
+  }
 }
 
 /*********************************************/
@@ -189,5 +190,5 @@ function includeMenu() {
       </table>
     </div>
     `;
-  document.getElementById("topmenu").outerHTML=menuText;
+  document.getElementById("topmenu").outerHTML = menuText;
 }

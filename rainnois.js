@@ -1,50 +1,65 @@
-/*eslint-env node*/
+'use strict';
 const schedule = require('node-schedule');
 const myF = require('./noisetfunc.js');
 const capteur1 = 42; //'pluvio';
 const path1 = 'pluie.csv';
 const path2 = 'pluie24.csv';
-//const path1 = 'C:\\Users\\jeanmarc\\Documents\\pluie.csv';
-//const path2 = 'C:\\Users\\jeanmarc\\Documents\\pluie24.essai.csv';
 const strURL1 = 'http://localhost:81/JSON?request=getstatus&ref=' + capteur1;
-// Set the headers
-const headers = {
-  'User-Agent': 'Super Agent/0.0.1',
-  'Content-Type': 'application/x-www-form-urlencoded'
-};
 const options = {
   url: strURL1,
   method: 'GET',
-  headers: headers
+  headers: {
+    'User-Agent': 'Super Agent/0.0.1',
+    'Content-Type': 'application/x-www-form-urlencoded'
+  }
 };
 
-const jobFiveMin = schedule.scheduleJob('10 4,9,14,19,24,29,34,39,44,49,54,59 * * * *', function(){
-  const requestP = require('request-promise');
-  const dateFormat = require('dateformat');
-  // Start the request
-  requestP(options) 
-    .then(function (response) {
-      const pluie = JSON.parse(response).Devices[0].value;
-      myF.eraseLastLine(path1);
-      myF.writeValHour(path2, +dateFormat(Date.now(), 'HH'), pluie - myF.getCumul(path2, +dateFormat(Date.now(), 'HH')));
-      myF.writeValDay(path1, pluie);
+const jobFiveMin = schedule.scheduleJob('10 4,9,14,19,24,29,34,39,44,49,54,59 * * * *', () => {
+  myF.getContentProm(options)
+  .then((response) => {
+    const pluie = JSON.parse(response).Devices[0].value;
+    const sep = ",";
+    const dateNow = myF.dateZZ();
+    const madate = `${dateNow} 00:00:00 `;
+    const texte = madate + sep + pluie + '\r\n';
+    myF.eraseLastLineProm(path1)
+    .then(() => {
+      myF.appendToFileProm(path1, texte).then((valeur) => {
+      });
     })
-    .catch(function (err) {
-      myF.processError('rainnois request ', err, 25);
+    .then(() => {
+      myF.getCumulProm(path2, +myF.dateHH())
+      .then((valeur) => {
+        const reste = pluie - valeur;
+        myF.writeValHourProm(path2, +myF.dateHH() + 1, reste)
+        .then(() => {return true});
+      })
+    })
+    .catch((err) => {
+      myF.processError('jobFiveMin request ', err, 31);
     });
+  });
 });
 
-const jobOnceADay = schedule.scheduleJob('10 1 0 * * *', function(){
-  const requestP = require('request-promise');
-  // Start the request
-  requestP(options) 
-    .then(function (response) {
-      const firstLine = 'heure,mm\r\n';  
-      const pluie = JSON.parse(response).Devices[0].value;
-      myF.writeNewFile(path2, firstLine);
-      myF.writeValDay(path1, pluie);
-    })
-    .catch(function (err) {
-      myF.processError('rainnois request ', err, 40);
+const jobOnceADay = schedule.scheduleJob('10 1 0 * * *', () => {
+  myF.getContentProm(options)
+  .then((response) => {
+    const firstLine= 'heure,mm\r\n';
+    const pluie = JSON.parse(response).Devices[0].value;
+    myF.writeNewFileProm(path2, firstLine)
+    .then(() => {
+      const sep = ",";
+      const dateNow = myF.dateZZ();
+      const madate = `${dateNow} 00:00:00 `;
+      const texte = madate + sep + pluie + '\r\n';
+      myF.appendToFileProm(path1, texte)
+      .then(() => {
+        myF.writeNewFileProm(path2, firstLine)
+        .then(); 
+      });
     });
+  })
+  .catch( (err) => {
+    myF.processError('jobOnceADay request', err, 56);
+  });
 });

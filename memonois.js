@@ -3,7 +3,7 @@
 //remove line
 function removeLine(arr) {
   "use strict";
-  return arr.filter(function (el) { return (el[0].substring(0, 4) === "node" || el[0].substring(0, 4) === "HSPI" || el[0].substring(0, 4) === "HS3."); });
+  return arr.filter(function (el) { return (el[0].substring(0, 4) === "node" || el[0].substring(0, 4) === "HSPI" || el[0].substring(0, 4) === "HS3." || el[0].substring(0, 4) === "ngin"); });
 }
 
 //remove col
@@ -36,19 +36,12 @@ function removeEmptyLine(arr) {
 //main func
 (function memonois() {
   "use strict";
-  const requestP = require('request-promise');
-  const fs = require("fs");
-  const dateFormat = require("dateformat");
   const myF = require('./noisetfunc.js');
   const sep = ",";
   let texte = "";
-  const madate = dateFormat(Date.now(), "yyyy/mm/dd HH:MM:ss");
+  const madate = myF.dateNF();
   const path1 = "./mem.csv";
   const path2 = "./mem2000.csv";
-  //let path1 = "C:\\Users\\jeanmarc\\Documents\\mem.csv";
-  //let path2 = "C:\\Users\\jeanmarc\\Documents\\mem3000.csv";
-
-  //configure request
   const options = {
     url: "http://127.0.0.1:1000/=rss",
     method: "GET",
@@ -57,7 +50,7 @@ function removeEmptyLine(arr) {
       "Content-Type": "application/x-www-form-urlencoded"
     }
   };
-  requestP(options) 
+  myF.getContentProm(options)
     .then(function (response) {
       const data = JSON.parse(response);
       const longo = data.length;
@@ -74,61 +67,39 @@ function removeEmptyLine(arr) {
         entry[0] = entry[0].substring(0, 3) + bcl;
         bcl++;
       });
-      let ttlioj = 0;
-      let ttlngi = 0;
+      let ttlnod = 0;
+      let ttlhsp = 0;
       let ttlhs3 = 0;
+      let ttlngi = 0;
       bar.forEach(function (entry) {
         switch (entry[0].substring(0, 3)) {
           case "nod":
-            ttlioj += parseInt(entry[2], 10);
+            ttlnod += parseInt(entry[2], 10);
             break;
           case "HSP":
-            ttlngi += parseInt(entry[2], 10);
+            ttlhsp += parseInt(entry[2], 10);
             break;
           case "HS3":
             ttlhs3 += parseInt(entry[2], 10);
             break;
+          case "ngi":
+            ttlngi += parseInt(entry[2], 10);
+            break;
           default:
         }
       });
-      //console.log(ttlioj + " - " + ttlngi + " - " + ttlhs3);
-      if (ttlioj === 0) { return 0; }
-      texte = `${madate}${sep}${ttlioj}${sep}${ttlngi}${sep}${ttlhs3}\r\n`;
-      //console.log(texte);
-      fs.appendFile(path1, texte, function (err) {
-        if (err) {
-          processError("memonois", err, 104);
-          return 0;
-        }
-        fs.readFile(path1, "utf8", function (err, dotum) {
-          if (err) {
-            processError("memonois", err, 109);
-            return 0;
-          }
-          let myarray = dotum.split("\r\n");
-          let fin = [];
-          if (myarray.length > 3000) {
-            fin = myarray.slice(myarray.length - 3000, myarray.length - 1);
-          } else {
-            fin = myarray;
-          }
-          fin[0] = "date,node,HSPI,hs3";
-          const fdesc = fs.openSync(path2, "w");
-          fin.forEach(function (v) {
-            fs.writeSync(fdesc, (v) + "\r\n");
-          });
-          fs.close(fdesc);
-          /*dateFormat = undefined;
-          fdesc = undefined;*/
-          fin.length = 0;
-          myarray.length = 0;
-          /*bar = undefined;
-          data = undefined;*/
+      if (ttlnod === 0) { return 0; }
+      texte = `${madate}${sep}${ttlnod}${sep}${ttlhsp}${sep}${ttlhs3}${sep}${ttlngi}\r\n`;
+
+      const myFirstLine = "date,node,hspi,hs3,nginx";
+      myF.appendToFileProm(path1, texte)
+        .then(() => {
+          myF.sliceFileProm(path1, path2, 3000, myFirstLine)
+          .then(() => {return true;})
+        })
+        .catch(function(e) {
+        console.log(e);
         });
-      });
-    })
-    .catch(function (err) {
-      myF.processError('cruedor request ', err, 33);
     });
-  setTimeout(memonois, 1200000);
+  setTimeout(memonois, 60000);
 })();
