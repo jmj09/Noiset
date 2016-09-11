@@ -7,7 +7,6 @@ const  os = require('os');
 //const exec2 = require("child_process").exec;
 
 server.get('/=rss', function (req, res) {
-  
   const options = {
     timeout: 5000,
     killSignal: "SIGKILL"
@@ -46,7 +45,6 @@ server.get('/=cpu', function(req, res) {
 });
 
 server.get('/=mem', function(req, res) {
-  
   const memRes1 = util.inspect((process.memoryUsage().rss / 1048576));
   const memRes2 = util.inspect((process.memoryUsage().heapTotal / 1048576));
   const memRes3 = util.inspect((process.memoryUsage().heapUsed / 1048576));
@@ -58,7 +56,6 @@ server.get('/=mem', function(req, res) {
 });
 
 server.get('/=osc', function(req, res) {
-  
   const osCpus = 	os.cpus();
   res.send(osCpus);
 });
@@ -69,7 +66,6 @@ server.get('/=ver', function(req, res) {
 });
 
 server.get('/=pas', function(req, res) {
-
   const options = {
     timeout: 5000,
     killSignal: "SIGKILL"
