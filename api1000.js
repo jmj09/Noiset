@@ -1,4 +1,3 @@
-"use strict";
 const restify = require('restify');
 const server = restify.createServer();
 const exec = require("child_process").exec;
