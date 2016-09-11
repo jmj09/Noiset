@@ -4,7 +4,6 @@ const exec = require("child_process").exec;
 const myF = require('./noisetfunc.js');
 const util = require('util');
 const  os = require('os');
-//const exec2 = require("child_process").exec;
 
 server.get('/=rss', function (req, res) {
   const options = {
