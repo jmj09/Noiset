@@ -9,7 +9,6 @@
   clftp.on("ready", function () {
     let myfiles = ["annot", "crue", "ener", "ener24", "mem2000", "pluie", "pluie24", "tensio", "temp5000"];
     (function ftpnext() {
-      
       fs.access(myfiles[0] + ".csv", function (err) {
         if (err) {
           myF.processError("file access pb ", err, 13);

@@ -1,7 +1,6 @@
-'use strict';
 const schedule = require('node-schedule');
 const myF = require('./noisetfunc.js');
-const capteur1 = 42; //'pluvio';
+const capteur1 = 42; //'pluvio'
 const path1 = 'pluie.csv';
 const path2 = 'pluie24.csv';
 const strURL1 = 'http://localhost:81/JSON?request=getstatus&ref=' + capteur1;
@@ -14,7 +13,7 @@ const options = {
   }
 };
 
-const jobFiveMin = schedule.scheduleJob('10 4,9,14,19,24,29,34,39,44,49,54,59 * * * *', () => {
+schedule.scheduleJob('10 4,9,14,19,24,29,34,39,44,49,54,58 * * * *', () => {
   myF.getContentProm(options)
   .then((response) => {
     const pluie = JSON.parse(response).Devices[0].value;
@@ -24,8 +23,8 @@ const jobFiveMin = schedule.scheduleJob('10 4,9,14,19,24,29,34,39,44,49,54,59 * 
     const texte = madate + sep + pluie + '\r\n';
     myF.eraseLastLineProm(path1)
     .then(() => {
-      myF.appendToFileProm(path1, texte).then((valeur) => {
-      });
+      myF.appendToFileProm(path1, texte)
+        .then(() => {});
     })
     .then(() => {
       myF.getCumulProm(path2, +myF.dateHH())
@@ -36,30 +35,26 @@ const jobFiveMin = schedule.scheduleJob('10 4,9,14,19,24,29,34,39,44,49,54,59 * 
       })
     })
     .catch((err) => {
-      myF.processError('jobFiveMin request ', err, 31);
+      myF.processError('jobFiveMin request ', err, 38);
     });
   });
 });
 
-const jobOnceADay = schedule.scheduleJob('10 1 0 * * *', () => {
+schedule.scheduleJob('10 1 0 * * *', () => {
   myF.getContentProm(options)
   .then((response) => {
     const firstLine= 'heure,mm\r\n';
     const pluie = JSON.parse(response).Devices[0].value;
-    myF.writeNewFileProm(path2, firstLine)
+    const sep = ",";
+    const madate = `${myF.dateNF()}`;
+    const texte = madate + sep + pluie + '\r\n';
+    myF.appendToFileProm(path1, texte)
     .then(() => {
-      const sep = ",";
-      const dateNow = myF.dateZZ();
-      const madate = `${dateNow} 00:00:00 `;
-      const texte = madate + sep + pluie + '\r\n';
-      myF.appendToFileProm(path1, texte)
-      .then(() => {
-        myF.writeNewFileProm(path2, firstLine)
-        .then(); 
-      });
+      myF.writeNewFileProm(path2, firstLine)
+      .then();
     });
   })
   .catch( (err) => {
-    myF.processError('jobOnceADay request', err, 56);
+    myF.processError('jobOnceADay request', err, 60);
   });
 });

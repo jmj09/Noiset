@@ -1,44 +1,7 @@
-/*eslint-env node*/
-
-//remove line
-function removeLine(arr) {
-  "use strict";
-  return arr.filter(function (el) { return (el[0].substring(0, 4) === "node" || el[0].substring(0, 4) === "HSPI" || el[0].substring(0, 4) === "HS3." || el[0].substring(0, 4) === "ngin"); });
-}
-
-//remove col
-function removeCol(array, remIdx) {
-  "use strict";
-  return array.map(function (arr) {
-    return arr.filter(function (idx) { return idx !== remIdx; });
-  });
-}
-
-//sort on first col
-function sortByCol0(a, b) {
-  "use strict";
-  let x = a[0];
-  let y = b[0];
-  return ((x > y) ? -1 : ((x < y) ? 1 : 0));
-}
-
-//remove empty line based on first col
-function removeEmptyLine(arr) {
-  "use strict";
-  for (let i = 0; i < arr.length; i++) {
-    if (arr[i][0] === "") {
-      arr.splice(i, 1);
-      return arr;
-    }
-  }
-}
-
 //main func
 (function memonois() {
-  "use strict";
   const myF = require('./noisetfunc.js');
   const sep = ",";
-  let texte = "";
   const madate = myF.dateNF();
   const path1 = "./mem.csv";
   const path2 = "./mem2000.csv";
@@ -56,13 +19,16 @@ function removeEmptyLine(arr) {
       const longo = data.length;
       let i;
       for (i = 0; i < longo; i++) {
-        removeEmptyLine(data);
+        myF.removeEmptyLine(data);
       }
-      let bar = removeCol(data, 1);
-      bar = bar.sort(sortByCol0);
-      bar = removeLine(bar);
-      let bcl = 1;
+      let bar = myF.removeCol(data, 1);
+      
+      bar = bar.sort(myF.sortByCol0);
       //console.log(bar);
+      bar = myF.removeLine(bar);
+      //console.log(bar);
+
+      let bcl = 1;
       bar.forEach(function (entry) {
         entry[0] = entry[0].substring(0, 3) + bcl;
         bcl++;
@@ -74,23 +40,22 @@ function removeEmptyLine(arr) {
       bar.forEach(function (entry) {
         switch (entry[0].substring(0, 3)) {
           case "nod":
-            ttlnod += parseInt(entry[2], 10);
+            ttlnod += parseInt(entry[1], 10);
             break;
           case "HSP":
-            ttlhsp += parseInt(entry[2], 10);
+            ttlhsp += parseInt(entry[1], 10);
             break;
           case "HS3":
-            ttlhs3 += parseInt(entry[2], 10);
+            ttlhs3 += parseInt(entry[1], 10);
             break;
           case "ngi":
-            ttlngi += parseInt(entry[2], 10);
+            ttlngi += parseInt(entry[1], 10);
             break;
           default:
         }
       });
       if (ttlnod === 0) { return 0; }
-      texte = `${madate}${sep}${ttlnod}${sep}${ttlhsp}${sep}${ttlhs3}${sep}${ttlngi}\r\n`;
-
+      const texte = `${madate}${sep}${ttlnod}${sep}${ttlhsp}${sep}${ttlhs3}${sep}${ttlngi}\r\n`;
       const myFirstLine = "date,node,hspi,hs3,nginx";
       myF.appendToFileProm(path1, texte)
         .then(() => {
@@ -100,6 +65,8 @@ function removeEmptyLine(arr) {
         .catch(function(e) {
         console.log(e);
         });
-    });
+    }).catch(function(e) {
+        console.log(e);
+      });
   setTimeout(memonois, 60000);
 })();

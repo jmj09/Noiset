@@ -1,4 +1,3 @@
-'use strict';
 const schedule = require('node-schedule');
 const myF = require('./noisetfunc.js');
 const capteur1 = 786; //'Owl.Ener.Cumul.Day';
@@ -14,7 +13,7 @@ const options = {
   }
 };
 
-const jobFiveMin = schedule.scheduleJob('10 4,9,14,19,24,29,34,39,44,49,54,59 * * * *', () => {
+schedule.scheduleJob('10 4,9,14,19,24,29,34,39,44,49,54,59 * * * *', () => {
   myF.getContentProm(options)
   .then((response) => {
     const ener = JSON.parse(response).Devices[0].value;
@@ -24,8 +23,8 @@ const jobFiveMin = schedule.scheduleJob('10 4,9,14,19,24,29,34,39,44,49,54,59 * 
     const texte = madate + sep + ener + '\r\n';
     myF.eraseLastLineProm(path1)
     .then(() => {
-      myF.appendToFileProm(path1, texte).then((valeur) => {
-      });
+      myF.appendToFileProm(path1, texte)
+        .then(() => {});
     })
     .then(() => {
       myF.getCumulProm(path2, +myF.dateHH())
@@ -36,30 +35,26 @@ const jobFiveMin = schedule.scheduleJob('10 4,9,14,19,24,29,34,39,44,49,54,59 * 
       })
     })
     .catch((err) => {
-      myF.processError('jobFiveMin request ', err, 31);
+      myF.processError('jobFiveMin request ', err, 38);
     });
   });
 });
 
-const jobOnceADay = schedule.scheduleJob('10 1 0 * * *', () => {
+schedule.scheduleJob('10 1 0 * * *', () => {
   myF.getContentProm(options)
   .then((response) => {
     const firstLine= 'heure,kWh\r\n';
     const ener = JSON.parse(response).Devices[0].value;
-    myF.writeNewFileProm(path2, firstLine)
+    const sep = ",";
+    const madate = `${myF.dateNF()}`;
+    const texte = madate + sep + ener + '\r\n';
+    myF.appendToFileProm(path1, texte)
     .then(() => {
-      const sep = ",";
-      const dateNow = myF.dateZZ();
-      const madate = `${dateNow} 00:00:00 `;
-      const texte = madate + sep + ener + '\r\n';
-      myF.appendToFileProm(path1, texte)
-      .then(() => {
-        myF.writeNewFileProm(path2, firstLine)
-        .then(); 
-      });
+      myF.writeNewFileProm(path2, firstLine)
+      .then();
     });
   })
   .catch( (err) => {
-    myF.processError('jobOnceADay request', err, 56);
+    myF.processError('jobOnceADay request', err, 60);
   });
 });

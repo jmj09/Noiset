@@ -1,5 +1,4 @@
 (function cruedor() {
-  "use strict";
   const myF = require('./noisetfunc.js');
   const options = {
     url: "http://www.vigicrues.gouv.fr/niveau3.php?CdStationHydro=P514001001&CdEntVigiCru=14&typegraphe=h&AffProfondeur=168&AffRef=tous&AffPrevi=non&nbrstations=1&ong=2",
@@ -22,6 +21,8 @@
         .catch(function(e) {
         console.log(e);
         });
+    }).catch(function(e) {
+      console.log(e);
     });
   setTimeout(cruedor, 21600000); //6h
 })();

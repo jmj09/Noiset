@@ -35,15 +35,11 @@ function writeFile(myVal) {
   }
   for (let i = 0; i < sensor.length; i++){options[i].url = strURL + sensor[i];}
   options[5].url = strPAS;
-
   let promises = [];
   options.forEach((myoption) => {promises.push(myF.getContentProm(myoption));})
-
   Promise.all(promises).then((values) => {
-
     for (let i = 0; i < sensor.length; i++){valor[i] = (JSON.parse(values[i]).Devices[0].value).toFixed(1);}
-
-    valor[5] =  (parseFloat(JSON.parse(values[5])) + 3.4).toFixed(2);
+    valor[5] =  (parseFloat(JSON.parse(values[5])) + 3.7).toFixed(2);
     if (valor[4] < 1) { valor[4] = 0; }
     if (valor[4] > 1) { valor[4] = Math.round(8 * Math.log(valor[4])); }
     writeFile(valor);
