@@ -21,8 +21,10 @@
       for (i = 0; i < longo; i++) {
         myF.removeEmptyLine(data);
       }
-      let bar = myF.removeCol(data, 1);
-      
+      let bar = [];
+      if (Array.isArray(data)) {
+        bar = myF.removeCol(data, 1);
+      }
       bar = bar.sort(myF.sortByCol0);
       //console.log(bar);
       bar = myF.removeLine(bar);

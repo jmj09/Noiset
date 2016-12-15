@@ -1,14 +1,14 @@
 const myF = require('./noisetfunc.js');
-const resizeImg = require('resize-img');
+const tufu = require('tufu-fix');
 const assert = require('assert');
-const lib = require('http');
 const warn = ' ********<o=o>*******';
 const fs = require('fs');
+const fileName = './fileTest.csv'
 
 //dateHH
 try {
-  const val = myF.dateHH(new Date(2016, 10, 03, 12, 12, 25, 450));
-  assert((val == 12), 'myF.dateHH fail');
+  const val = myF.dateHH(new Date(2016, 10, 3, 12, 12, 25, 450));
+  assert((val == 12), `myF.dateHH fail`);
   console.log('myF.dateHH ok');
 } catch (ex) {
   console.log(ex.message + warn);
@@ -16,7 +16,7 @@ try {
 
 //dateNF
 try {
-  const val = myF.dateNF(new Date(2016, 10, 03, 13, 12, 25, 450));
+  const val = myF.dateNF(new Date(2016, 10, 3, 13, 12, 25, 450));
   assert((val == '2016/11/03 13:12:25'), 'myF.dateNF fail');
   console.log('myF.dateNF ok');
 } catch (ex) {
@@ -25,7 +25,7 @@ try {
 
 //dateZZ
 try {
-  const val = myF.dateZZ(new Date(2016, 11, 03, 13, 12, 25, 450));
+  const val = myF.dateZZ(new Date(2016, 11, 3, 13, 12, 25, 450));
   assert((val == '2016/12/03'), 'myF.dateZZ fail');
   console.log('myF.dateZZ ok');
 } catch (ex) {
@@ -65,18 +65,12 @@ try {
 }
 
 //resize image
-try{ fs.unlinkSync('./netcam/test.jpg');
-}
-catch (ex) {
-}
-
 try {
-  resizeImg(fs.readFileSync('netcam/CurrentImage.jpg'), {width: 1000, height: 600}).then(buf => {
-    fs.writeFileSync('./netcam/test.jpg', buf);
-    const exists = fs.statSync("./netcam/test.jpg");
-    assert(exists.size >  20000  && exists.size <  50000 , 'resize image fail');
-    console.log('resize image ok');
-  });
+  tufu("./netcam/CurrentImage.jpg").resize(1000, 600).compress(30).save("./netcam/test.jpg");
+  const exists = fs.statSync("./netcam/test.jpg");
+  assert(exists.size >  20000  && exists.size <  60000 , 'resize image fail');
+  console.log('resize image ok');
+  
 } catch (ex) {
   console.log(ex.message + warn);
 }
@@ -140,7 +134,7 @@ try {
   myF.getContentProm(options)
     .then(function (response) {
       const data = JSON.parse(response);
-      assert(typeof data == 'object' && Object.keys(data).length == 9,  'get api1000 VER fail');
+      assert(typeof data == 'object' && Object.keys(data).length == 12,  'get api1000 VER fail');
       console.log('get api1000 VER ok');
     })
     .catch ((ex) => {
@@ -241,22 +235,70 @@ try {
 
 //writeNewFileProm then writeHourProm then getCumulProm
 try {
-  try{ fs.unlinkSync('./newFileTest.csv');
-}
-  catch (ex) {
-}
-
-const randomH = Math.floor((Math.random() * 23) + 1);
-const randomV = Math.floor((Math.random() * 1000) + 100);
-myF.writeNewFileProm('./newFileTest.csv','heure, test\r\n')
-  .then (() => {myF.writeValHourProm('./newFileTest.csv', randomH, randomV)
-    .then (() => {myF.getCumulProm('./newFileTest.csv', randomH)
-      .then((val) => {
-        assert((val==randomV), 'myF.newFileTest fail');
-        console.log('myF.newFileTest ok');
+  const randomH = Math.floor((Math.random() * 23) + 1);
+  const randomV = Math.floor((Math.random() * 1000) + 100);
+  myF.writeNewFileProm('./newFileTest.csv','heure, test\r\n')
+    .then (() => {myF.writeValHourProm(fileName, randomH, randomV)
+      .then (() => {myF.getCumulProm(fileName, randomH)
+        .then((val) => {
+          assert((val==randomV), '256 writeNewFileProm fail');
+          console.log('writeNewFileProm ok');
+        });
       });
+    })
+    .catch ((ex) => {
+      console.log(ex.message + warn);
     });
-  })
 } catch (ex) {
   console.log(ex.message + warn);
 }
+/*
+//writeNewFileProm then delete last line then append new line twice then delete last line then getCumulProm
+try {
+  try{ fs.unlinkSync(fileName);
+  }
+  catch (ex) {
+  }
+  myF.writeNewFileProm(fileName,'heure, val\r\n')
+  .then (ret1 => { myF.eraseLastLineProm(fileName)
+    .then(ret2 => { myF.appendToFileProm(fileName, '23,1732\r\n24,10\r\n')
+      .then (ret3 => {process.exit(); myF.eraseLastLineProm(fileName).then()});
+    });
+  })
+  .catch ((ex) => {
+    console.log(ex.message + warn);
+  });
+}
+catch (ex) {
+  console.log(ex.message + warn);
+}
+*/
+
+//writeNewFileProm then sliceFileProm then count lines
+try {
+  const fileShort = 'shortTest.csv';
+  const numLines = Math.floor((Math.random() * 23) + 1);
+  const firstLine = 'first,line';
+  myF.writeNewFileProm(fileName,'heure, val\r\n')
+  .then (() => {myF.sliceFileProm(fileName, fileShort, numLines, firstLine)
+    .then(() => {fs.readFile(fileShort, (err, data) => {
+        if (err) {
+          reject(err);
+        }
+        else {
+          let lineArray = data.toString().split('\r\n');
+          assert((lineArray.length = numLines), '305 sliceFileProm fail');
+          console.log('sliceFileProm ok');
+        }
+      })
+    })
+  })
+  .catch ((ex) => {
+    console.log(ex.message + warn);
+  });
+}
+catch (ex) {
+  console.log(ex.message + warn);
+}
+
+

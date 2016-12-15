@@ -27,7 +27,7 @@ schedule.scheduleJob('10 4,9,14,19,24,29,34,39,44,49,54,59 * * * *', () => {
         .then(() => {});
     })
     .then(() => {
-      myF.getCumulProm(path2, +myF.dateHH())
+      myF.getCumulProm(path2, + myF.dateHH())
       .then((valeur) => {
         const reste = ener - valeur;
         myF.writeValHourProm(path2, +myF.dateHH() + 1, reste)
@@ -36,7 +36,12 @@ schedule.scheduleJob('10 4,9,14,19,24,29,34,39,44,49,54,59 * * * *', () => {
     })
     .catch((err) => {
       myF.processError('jobFiveMin request ', err, 38);
+      return false
     });
+  })
+  .catch((err) => {
+      myF.processError('jobFiveMin getContentProm ', err, 38);
+      return false
   });
 });
 
@@ -55,6 +60,6 @@ schedule.scheduleJob('10 1 0 * * *', () => {
     });
   })
   .catch( (err) => {
-    myF.processError('jobOnceADay request', err, 60);
+    myF.processError('jobOnceADay getContentProm', err, 60);
   });
 });

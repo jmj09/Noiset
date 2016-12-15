@@ -19,20 +19,22 @@
       for (let i = 0; i < data.length; i++) {
         myF.removeEmptyLine(data);
       }
-      let bar = data; //myF.removeCol(data, 1);
-      bar = bar.sort(myF.sortByCol0);
-      bar = myF.removeLine(bar);
-      let bcl = 1;
-      bar.forEach(function (entry) {
-        let texte = `${madate}${sep}${parseInt(entry[1], 10).toString()}${sep}${entry[2].trim()}\r\n`;
-        fs.appendFile(path1, texte, function (err) {
-          if (err) {
-            myF.processError('memonode', err, 34);
-            return 0;
-          }
+      let bar = data;
+      if (Array.isArray(bar)) {
+        bar = bar.sort(myF.sortByCol0);
+        bar = myF.removeLine(bar);
+        let bcl = 1;
+        bar.forEach(function (entry) {
+          let texte = `${madate}${sep}${parseInt(entry[1], 10).toString()}${sep}${entry[2].trim()}\r\n`;
+          fs.appendFile(path1, texte, function (err) {
+            if (err) {
+              myF.processError('memonode', err, 34);
+              return 0;
+            }
+          });
+          bcl = bcl + 1;
         });
-        bcl = bcl + 1;
-      });
+      }
     })
     .catch(function (err) {
       myF.processError('memononode request ', err, 39);

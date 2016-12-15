@@ -1,8 +1,7 @@
 const fs = require('fs');
 const lib = require('http');
-const myF = require('./noisetfunc.js');
 
-//test ok
+//tested in test.js
 exports.writeValHourProm = function (file, line, val) {
   const sep = ',';
   return new Promise((resolve, reject) => {
@@ -31,7 +30,7 @@ exports.writeValHourProm = function (file, line, val) {
   });
 };
 
-//test ok
+//tested in test.js
 exports.getCumulProm = (file, hour) => {
   return new Promise((resolve, reject) => {
     fs.readFile(file, (err, data) => {
@@ -62,7 +61,7 @@ exports.processError = (funcName, err, ligne) => {
     const num = `${dateNow.getFullYear()}${stepd}${n(dateNow.getMonth()+1)}`
    + `${stepd}${n(dateNow.getDate())}${space}${n(dateNow.getHours())}`
    + `${steph}${n(dateNow.getMinutes())}${steph}${n(dateNow.getSeconds())}`;
-  if(ligne ==  0){return true}; 
+  if(ligne ==  0){return true;}
   console.log(`${funcName} - ligne ${ligne} : ${num} at ${err}`);
   return true;
 };
@@ -99,12 +98,14 @@ exports.dateZZ = (dte = new Date()) => {
   return dft;
 };
 
+//tested in test.js
 exports.getContentProm = (addr) => {
   return new Promise((resolve, reject) => {
     lib.get(addr.url, (response) => {
       if (response.statusCode < 200 || response.statusCode > 299) {
-         reject(new Error('Failed to load page, status code: ' + response.statusCode));
-       }
+        console.log('statut connexion ' + response.statuscode);
+        reject(new Error('Failed to load page, status code: ' + response.statusCode));
+      }
       const body = [];
       response.on('data', (chunk) => body.push(chunk));
       response.on('end', () => {
@@ -115,6 +116,7 @@ exports.getContentProm = (addr) => {
   });
 };
 
+//tested in test.js
 exports.appendToFileProm = (file, texte) => {
   return new Promise((resolve, reject) => {
     fs.appendFile(file, texte, (err) => {
@@ -128,6 +130,7 @@ exports.appendToFileProm = (file, texte) => {
   });
 };
 
+//tested in test.js
 exports.eraseLastLineProm = function(file) {
   return new Promise((resolve, reject) => {
     fs.readFile(file, (err, data) => {
@@ -174,7 +177,7 @@ exports.writeNewFileProm = function(file, header) {
   });
 };
 
-exports.sliceFileProm = function(fileLong, fileShort, numLines, firstLine) {
+exports.sliceFileProm = (fileLong, fileShort, numLines, firstLine) => {
   return new Promise((resolve, reject) => {
     fs.readFile(fileLong, 'utf8', (err, data) => {
       if (err) { reject(err); }
@@ -238,7 +241,7 @@ exports.promises = () => {
     promises = promises.concat(() => Promise.resolve());
     promises
     .reduce(iterateeFunc, Promise.resolve(false))
-    .then(function (res) {
+    .then(function () {
       resolve(results);
     })
   });
@@ -246,9 +249,11 @@ exports.promises = () => {
 
 //tested in test.js
 exports.removeCol = (array, remIdx) => {
-  return array.map(function(arr) {
-    return arr.filter(function(el,idx){return idx !== remIdx});  
-  });
+  if (Array.isArray(array)) {
+    return array.map(function(arr) {
+      return arr.filter(function(el,idx){return idx !== remIdx});
+    });
+  }
 };
 
 //tested in test.js

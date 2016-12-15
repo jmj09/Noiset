@@ -43,8 +43,10 @@ const options3 = {
     const madate = myF.dateNF();
     const texte = `${madate}${sep}${hum1}${sep}${hum2}${sep}${hum3}\r\n`;
     myF.appendToFileProm(path1, texte);
-  }, (raisonRejet) => {
-    console.log(raisonRejet)
+  })
+  .catch(function(e) {
+    console.log('tensionois.js appendToFileprom ' + e)
+    return false;
   });
-setTimeout(getAll, 3600000); //1h
+  setTimeout(getAll, 3600000); //1h
 })();
