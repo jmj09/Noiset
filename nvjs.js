@@ -126,7 +126,7 @@ function makeMultiBar(){
             .margin({top: 50, right: 60, bottom: 30, left: 70});
             //.legendRightAxisHint(' [Using Right Axis]');
            // .color(d3.scale.category10().range());
-           
+
         chart.color(["#1f77b4"]);
         chart.xAxis.tickFormat(function(d) {
                 return d3.time.format('%x')(new Date(d));
@@ -137,11 +137,11 @@ function makeMultiBar(){
         chart.x2Axis.tickFormat(function(d) {
             return d3.time.format('%x')(new Date(d));
         }).showMaxMin(false);
-        
+
         d3.select('#chart1 svg')
             .datum(dat)
             .call(chart);
-        
+
         nv.utils.windowResize(chart.update);
         //chart.dispatch.on('stateChange', function(e) { nv.log('New State:', JSON.stringify(e)); });
         return chart;

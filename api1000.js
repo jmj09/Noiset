@@ -37,13 +37,14 @@ server.get('/=pas', function(req, res) {
   try {
     exec2('YPressure METEO get_currentValue', options, function (err, stdout, stderr) {
       const line = stdout.toString();
+      if (stderr) {console.log(stderr);}
       const results = line.slice(-11,-3);
       res.send(results);
     });
   } catch(err) {
     myF.processError('api1000-server.get-pas ', err, 55);
     res.send(0);
-  }  
+  }
 });
 
 //tested in test.js
@@ -54,6 +55,7 @@ server.get('/=rss', function (req, res) {
   };
   exec1('tasklist', options, function (err, stdout, stderr) {
     const lines = stdout.toString().split('\n');
+    if (stderr) {console.log(stderr);}
     const results = [];
     try {
       lines.forEach(function (line) {
@@ -68,7 +70,7 @@ server.get('/=rss', function (req, res) {
       myF.processError('api1000-server.get-rss ', err, 55);
       res.send([{"error":"api1000-server.get-rss"}]);
     }
-    
+
   });
 });
 
@@ -87,7 +89,7 @@ server.get('/=cpu', function(req, res) {
     myF.processError('api1000-server.get-cpu ', err, 55);
     res.send([{"error":"api1000-server.get-cpu"}]);
   }
-  
+
 });
 
 //tested in test.js
@@ -105,7 +107,7 @@ server.get('/=mem', function(req, res) {
     myF.processError('api1000-server.get-mem ', err, 55);
     res.send([{"error":"api1000-server.get-mem"}]);
   }
-  
+
 });
 
 server.on('uncaughtException', function(req, res, route, err) {

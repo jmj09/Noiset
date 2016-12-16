@@ -70,7 +70,7 @@ try {
   const exists = fs.statSync("./netcam/test.jpg");
   assert(exists.size >  20000  && exists.size <  60000 , 'resize image fail');
   console.log('resize image ok');
-  
+
 } catch (ex) {
   console.log(ex.message + warn);
 }

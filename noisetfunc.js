@@ -211,7 +211,7 @@ exports.decrement = () => {
     myTarget = 'netcam/' + (i-1) + '.jpg';
     if (fs.existsSync(mySource)) {
       fs.renameSync(mySource, myTarget);
-    } else { // source dont exist copy previous file to fill the gap
+    } else { // source does'nt exist copy previous file to fill the gap
         mySource = 'netcam/' + (i-2) + '.jpg';
         if (fs.existsSync(mySource)) {
           fs.renameSync(mySource, myTarget);

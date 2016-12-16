@@ -21,14 +21,14 @@ function speakText(texte) {
   SimpleTTS.getVoices().then(function(voices) {
     SimpleTTS.read({
       text: texte,
-      voice: voices[2], // optionnal, object or text, default first language detected 
-      volume: 30, // optionnal, percentage, 0 -> 100, default 100 
-      speed: 50 // optionnal, percentage, 0 -> 100, default 50 
+      voice: voices[2], // optionnal, object or text, default first language detected
+      volume: 30, // optionnal, percentage, 0 -> 100, default 100
+      speed: 50 // optionnal, percentage, 0 -> 100, default 50
     }).then(function() {
       //console.log("done"); // for debug
     }).catch(function(err) {
       console.log("erreur 28 " +  err);
-    }); 
+    });
   }).catch(function(err) {
     console.log("erreur 31 " + err);
   });
