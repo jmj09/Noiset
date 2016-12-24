@@ -67,9 +67,6 @@ function makeLineFocus(filestring, title, subtitle){
     for (var i = 0; i < 100; i++) {
     sin.push({hour: data[i].heure, val: data[i].kWh});
     }
-    let dat = [
-    {key: "Bars", values: sin}
-    ];
     let dac = document.getElementById("ttl");
     dac.innerHTML = '<h1>'+ title + ' ' +  subtitle + '</h1>';
     nv.addGraph(function() {
@@ -108,9 +105,7 @@ function makeMultiBar(){
             series.values = series.values.map(function(d) { return {x: d[0], y: d[1] } });
             return series;
         });*/
-       "use strict";
-    let sin = [];
-  d3.csv(ener.csv, function (error, data) {
+    d3.csv(ener.csv, function (error, data) {
     var sin = [];
     var lgth = data.length;
     for (var i = 0; i < lgth; i++) {
